@@ -11,8 +11,8 @@ type FSM interface {
 }
 
 type fsm struct {
-	state State
-	transitions map[State] map[State] Condition
+	state       State
+	transitions map[State]map[State]Condition
 }
 
 func (m *fsm) Execute(event interface{}) (State, error) {
@@ -36,7 +36,7 @@ func (m fsm) GetState() State {
 func (m *fsm) AddTransition(stateFrom State, stateTo State, condition Condition) (FSM, error) {
 	t, hasTransitions := m.transitions[stateFrom]
 	if !hasTransitions {
-		t = make(map[State] Condition)
+		t = make(map[State]Condition)
 	}
 
 	if _, hasState := t[stateTo]; hasState {
@@ -44,14 +44,15 @@ func (m *fsm) AddTransition(stateFrom State, stateTo State, condition Condition)
 	}
 
 	t[stateTo] = condition
+	m.transitions[stateFrom] = t
 
 	return m, nil
 }
 
 func NewFSM(initialState State) FSM {
 	m := fsm{
-		state: initialState,
-		transitions: make(map[State] map[State] Condition),
+		state:       initialState,
+		transitions: make(map[State]map[State]Condition),
 	}
 
 	return &m
